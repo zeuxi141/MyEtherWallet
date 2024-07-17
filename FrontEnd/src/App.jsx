@@ -1,3 +1,5 @@
+import { Box } from '@mui/material'
+import AppBar from './components/AppBar/index'
 import Board from './pages/Board/_id'
 
 function App() {
@@ -5,9 +7,10 @@ function App() {
 
 
   return (
-    <>
+    <Box sx={{minHeight: '100vh'}}>
+      <AppBar />
       <Board/>
-    </>
+    </Box>
   )
 }
 

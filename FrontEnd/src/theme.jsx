@@ -1,4 +1,4 @@
-import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
+import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
 
 
 const theme = extendTheme({
@@ -9,20 +9,26 @@ const theme = extendTheme({
   colorSchemes: {
     light: {
       palette: {
-        // primary: {
-        //   main: '#ff5252'
-        // }
-      }
+        primary: {
+          main: '#2196f3',
+        },
+        secondary: {
+          main: '#f50057',
+        },
+      },
     },
     dark: {
       palette: {
-        // primary: {
-        //   main: '#000'
-        // }
-      }
-    }
-  }
+        primary: {
+          main: '#3f51b5',
+        },
+        secondary: {
+          main: '#ff4081',
+        },
+      },
+    },
+  },
   // ...other properties
-})
+});
 
 export default theme
