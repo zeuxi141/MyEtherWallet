@@ -19,31 +19,32 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
     {
       symbol: "ETH",
       name: "Ethereum",
-      balance: 10000000000,
+      balance: 0,
       decimals: 18,
     },
     {
       symbol: "LINK",
       name: "Chainlink",
-      balance: 10000000000,
+      balance: 0,
       decimals: 18,
     },
     {
       symbol: "UNI",
       name: "Uniswap",
-      balance: 10000000000,
+      balance: 0,
       decimals: 18,
     },
     {
       symbol: "MATIC",
       name: "Polygon",
-      balance: 10000000000,
+      balance: 0,
       decimals: 18,
     },
   ]
   
   const NFTs = [
-    
+    "https://images.nightcafe.studio/jobs/IV3A9hRfFfSrPn5eTWVo/IV3A9hRfFfSrPn5eTWVo--1--6t38k_6.9444x.jpg?tr=w-1600,c-at_max",
+    "https://i.pinimg.com/736x/e2/cd/a3/e2cda32c285fe1c65a2bed50856739b1.jpg"
   ]
 
   const navigate = useNavigate()
@@ -65,7 +66,10 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
                     <List.Item.Meta
                       avatar={<Avatar>{item.symbol}</Avatar>}
                       title={item.name}
-                      description={`Balance: ${Number(item.balance)/10 ** Number(item.decimals).toFixed(2)} Tokens`}
+                      description={`Balance: 
+                        ${(Number(item.balance) / 
+                          10 ** Number(item.decimals
+                          )).toFixed(2)} Tokens`}
                     />
                   </List.Item>
                 )}
@@ -89,13 +93,15 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
         <>
           {NFTs ? (
             <>
-              {NFTs.map((nft, i) => {
+              {NFTs.map((e, i) => {
                 return (
                   <>
                     {e && (
                       <img 
+                        style={{objectFit: "cover", width: "100px", height: "100px", marginLeft: "10px"}}
                         key={i}
                         className="nftImage"
+                        sizes="cover"
                         alt="NFT"
                         src={e}
                       />
@@ -106,8 +112,7 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
             </>
           ):(
             <>
-              <List.Item>
-              </List.Item>
+              <List/>
             </>
             )}
         </>
