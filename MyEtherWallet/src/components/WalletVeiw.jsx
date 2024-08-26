@@ -1,3 +1,4 @@
+import { LogoutOutlined } from "@ant-design/icons";
 import {
   Avatar,
   Divider,
@@ -5,47 +6,21 @@ import {
   Tabs,
   Tooltip
 } from "antd";
-import React from "react";
-
-import { LogoutOutlined } from "@ant-design/icons";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 
 
 
 
 function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain}) {
 
-  const tokens = [
-    {
-      symbol: "ETH",
-      name: "Ethereum",
-      balance: 0,
-      decimals: 18,
-    },
-    {
-      symbol: "LINK",
-      name: "Chainlink",
-      balance: 0,
-      decimals: 18,
-    },
-    {
-      symbol: "UNI",
-      name: "Uniswap",
-      balance: 0,
-      decimals: 18,
-    },
-    {
-      symbol: "MATIC",
-      name: "Polygon",
-      balance: 0,
-      decimals: 18,
-    },
-  ]
-  
-  const NFTs = [
-    "https://images.nightcafe.studio/jobs/IV3A9hRfFfSrPn5eTWVo/IV3A9hRfFfSrPn5eTWVo--1--6t38k_6.9444x.jpg?tr=w-1600,c-at_max",
-    "https://i.pinimg.com/736x/e2/cd/a3/e2cda32c285fe1c65a2bed50856739b1.jpg"
-  ]
+  const [tokens, setTokens] = useState(null)
+  const [NFTs, setNFTs] = useState(null)
+  const [balance, setBalance] = useState(0)
+  const [fetching, setFetching] = useState(true)
+
 
   const navigate = useNavigate()
 
@@ -129,11 +104,62 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
     }
   ]
 
+  async function getAccountTokens() {
+    setFetching(true)
+
+    const res = await axios.get(
+      `http://localhost:8017/getTokens`, {
+        params: {
+          userAddress: wallet,
+          chain: selectedChain
+        }
+    });
+
+    const response = res.data
+
+    console.log(response)
+
+    if(response.tokens.length > 0){
+      setTokens(response.tokens)
+      console.log(response.tokens)
+    }
+
+    if(response.nfts.length > 0){
+      setNFTs(response.nfts)
+    }
+
+    setBalance(response.balance)
+
+    setFetching(false)
+
+  }
+
   function logout() {
     setWallet(null)
     setSeedPhrase(null)
+    setNFTs(null)
+    setTokens(null)
+    setBalance(0)
     navigate("/")
   }
+
+  useEffect(() => {
+    if(!wallet || !selectedChain) return;
+    setNFTs(null)
+    setTokens(null)
+    setBalance(0)
+    getAccountTokens();
+  }, [])
+
+
+  useEffect(() => {
+    if(!wallet) return;
+    setNFTs(null)
+    setTokens(null)
+    setBalance(0)
+    getAccountTokens();
+    console.log(selectedChain)
+  }, [selectedChain])
 
   return (
     <div>
