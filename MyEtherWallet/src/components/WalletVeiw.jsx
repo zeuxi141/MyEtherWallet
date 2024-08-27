@@ -40,11 +40,11 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
                   <List.Item>
                     <List.Item.Meta
                       avatar={<Avatar>{item.symbol}</Avatar>}
-                      title={item.name}
+                      title={item.name == "Gold" ? "SpeoliaETH" : item.name}
                       description={`Balance: 
                         ${(Number(item.balance) / 
-                          10 ** Number(item.decimals
-                          )).toFixed(2)} Tokens`}
+                        (10 ** Number(item.decimals))).toFixed(4)} Tokens
+                      `}
                     />
                   </List.Item>
                 )}
@@ -101,9 +101,48 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
           Transfer
         </>
       ),
+    }  
+  ]
+
+  const tokenList = [
+    {
+      name: "Ethereum",
+      value: "0x1",
+      symbol: "ETH",
+      decimals: 18,
+      balance: 0
+    },
+    {
+      name: "Sepolia",
+      value: "0xaa36a7",
+      symbol: "SepoliaETH",
+      decimals: 18,
+      balance: 0
+    },
+    {
+      name: "Mumbai testnet",
+      value: "0x13881",
+      symbol: "LINK",
+      decimals: 18,
+      balance: 0
+    },
+    {
+      name: "Avalanche",
+      value: "0xa86a",
+      symbol: "AVAX",
+      decimals: 18,
+      balance: 0
+    },
+    {
+      name: "Polygon",
+      value: "0x89",
+      symbol: "MATIC",
+      decimals: 18,
+      balance: 0
     }
   ]
 
+  //get the tokens and NFTs of the user
   async function getAccountTokens() {
     setFetching(true)
 
@@ -128,12 +167,13 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
       setNFTs(response.nfts)
     }
 
-    setBalance(response.balance)
+    setBalance(response.balance.balance)
 
     setFetching(false)
 
   }
 
+  //logout the user
   function logout() {
     setWallet(null)
     setSeedPhrase(null)
@@ -143,6 +183,7 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
     navigate("/")
   }
 
+  //get the tokens and NFTs of the user when the component mounts
   useEffect(() => {
     if(!wallet || !selectedChain) return;
     setNFTs(null)
@@ -152,13 +193,13 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
   }, [])
 
 
+  //get the tokens and NFTs of the user when the chain changes
   useEffect(() => {
     if(!wallet) return;
     setNFTs(null)
     setTokens(null)
     setBalance(0)
     getAccountTokens();
-    console.log(selectedChain)
   }, [selectedChain])
 
   return (
@@ -175,8 +216,15 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
             {wallet.slice(0, 4)}...{wallet.slice(-4)}
           </div>
         </Tooltip>
+        <div>
+          Balance: {(Number(balance) / (10 ** 18)).toFixed(4)} {tokenList.find(token => token.value === selectedChain)?.symbol}
+        </div>
         <Divider />
-        <Tabs defaultActiveKey="1" items={items} className="walletVeiw"></Tabs>
+        {/* {fetching ? (
+          <Spin />
+        ):(
+        )} */}
+        <Tabs defaultActiveKey="1" items={items} className="walletVeiw"></Tabs> 
       </div>
     </div>
   );

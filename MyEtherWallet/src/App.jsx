@@ -30,7 +30,6 @@ function App() {
         value={selectionChain}
         onChange={handleChange}
       >
-        <MenuItem value="">Select a chain</MenuItem>
         <MenuItem value="0x1">Ethereum</MenuItem>
         <MenuItem value="0x13881">Mumbai testnet</MenuItem>
         <MenuItem value="0x89">Polygon</MenuItem>

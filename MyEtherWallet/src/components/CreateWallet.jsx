@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 //Create wallet component
 function CreateWallet({setWallet, setSeedPhrase}) {
-  const [newSeedPhrase, setNewSeedPhrase] = React.useState(null);
+  const [newSeedPhrase, setNewSeedPhrase] = React.useState("");
   const navigate = useNavigate();
 
   function generateWallet() {
