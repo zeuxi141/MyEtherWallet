@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CHAINS_CONFIG } from "../chain";
 import tokenList from "../tokenList";
+import TransactionHistory from './TransactionHistory';
 
 
 
@@ -159,39 +160,7 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
       label: "History", // Tab History
       children: (
         <>
-          {fetching ? (
-            <Spin />
-          ) : transactions.length ? (
-            <List
-              itemLayout="horizontal"
-              dataSource={transactions}
-              renderItem={(transaction) => (
-                <List.Item>
-                  <List.Item.Meta
-                    title={`Tx Hash: ${transaction.hash}`}
-                    description={
-                      <>
-                        <p>Block Number: {transaction.blockNumber}</p>
-                        <p>Amount: {ethers.utils.formatEther(transaction.value)} ETH</p>
-                        <p>To: {transaction.to}</p>
-                        <p>
-                          <a
-                            href={`https://etherscan.io/tx/${transaction.hash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            View on Etherscan
-                          </a>
-                        </p>
-                      </>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          ) : (
-            <p>No transactions found</p>
-          )}
+          <TransactionHistory address={wallet} />
         </>
       ),
     },
@@ -199,33 +168,34 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
 
   //get history of transactions
     // Lấy lịch sử giao dịch
-    async function getTransactionHistory() {
-      setFetching(true);
-      try {
-        const apiKey = 'ETHERSCAN_API_KEY'; // Thay bằng API Key của bạn
-        const baseUrl =
-          selectedChain === "sepolia"
-            ? `https://api-sepolia.etherscan.io/api`
-            : `https://api.etherscan.io/api`;
+    // async function getTransactionHistory() {
+    //   setFetching(true);
+    //   try {
+    //     const apiKey = 'ETHERSCAN_API_KEY'; // Thay bằng API Key của bạn
+    //     const baseUrl =
+    //       selectedChain === "sepolia"
+    //         ? `https://api-sepolia.etherscan.io/api`
+    //         : `https://api.etherscan.io/api`;
   
-        const res = await axios.get(baseUrl, {
-          params: {
-            module: "account",
-            action: "txlist",
-            address: wallet,
-            startblock: 0,
-            endblock: 99999999,
-            sort: "desc",
-            apikey: apiKey,
-          },
-        });
+    //     const res = await axios.get(baseUrl, {
+    //       params: {
+    //         module: "account",
+    //         action: "txlist",
+    //         address: wallet,
+    //         startblock: 0,
+    //         endblock: 99999999,
+    //         sort: "desc",
+    //         apikey: apiKey,
+    //       },
+    //     });
   
-        setTransactions(res.data.result || []);
-      } catch (error) {
-        console.error("Error fetching transaction history:", error);
-      }
-      setFetching(false);
-    }
+    //     setTransactions(res.data.result || []);
+    //   } catch (error) {
+    //     console.error("Error fetching transaction history:", error);
+    //   }
+    //   setFetching(false);
+    // }
+    
   
   // Hàm gửi giao dịch
   async function sendTransaction(to, amount) {
