@@ -15,7 +15,7 @@ import WalletView from './components/WalletVeiw';
 function App() {
   const [wallet, setWallet] = useState(null);
   const [seedPhrase, setSeedPhrase] = useState(null);
-  const [selectionChain, setSelectionChain] = useState("0x1")
+  const [selectionChain, setSelectionChain] = useState("0xaa36a7")
 
   const handleChange = (event) => {
     setSelectionChain(event.target.value);
@@ -35,8 +35,8 @@ function App() {
         <MenuItem value="0x89">Polygon</MenuItem>
         <MenuItem value="0xa86a">Avalanche</MenuItem>
         <MenuItem value="0xaa36a7">Sepolia</MenuItem>
-
       </Select>
+
       </FormControl>
     </header>
     <Router>

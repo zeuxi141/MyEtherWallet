@@ -1,14 +1,21 @@
 import { LogoutOutlined } from "@ant-design/icons";
 import {
   Avatar,
+  Button,
   Divider,
+  Input,
   List,
+  notification,
+  Spin,
   Tabs,
   Tooltip
 } from "antd";
 import axios from "axios";
+import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CHAINS_CONFIG } from "../chain";
+import tokenList from "../tokenList";
 
 
 
@@ -20,6 +27,11 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
   const [NFTs, setNFTs] = useState(null)
   const [balance, setBalance] = useState(0)
   const [fetching, setFetching] = useState(true)
+  const [sendToAddress, setSendToAddress] = useState(null)
+  const [AmoutToSend, setAmountToSend] = useState(null)
+  const [proccessing, setProccessing] = useState(false)
+  const [hash, setHash] = useState(null)
+  const [transactions, setTransactions] = useState([]);
 
 
   const navigate = useNavigate()
@@ -93,54 +105,189 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
         </>
       ),
     },
+    //transfer tokens
     {
       key: "1",
       label: "Transfer",
       children: (
         <>
-          Transfer
+          <div className="headContent">
+            <h3>Native Balance</h3>
+            <div>
+            Balance: {(Number(balance) / (10 ** 18)).toFixed(4)} {tokenList.find(token => token.value === selectedChain)?.symbol}
+            </div>
+          </div>
+          <div className="sendRow">
+            <p style={{width: "90px", textAlign: 'left' }}> To: </p>
+            <Input 
+              placeholder="Enter address" 
+              value={sendToAddress}
+              onChange={(e) => setSendToAddress(e.target.value)}
+            />
+          </div>
+          <div className="sendRow">
+            <p style={{width: "90px", textAlign: 'left' }}> Amount: </p>
+            <Input 
+              placeholder="Enter amount" 
+              value={AmoutToSend}
+              onChange={(e) => setAmountToSend(e.target.value)}
+            />
+          </div>
+          <Button
+            style={{width: "100%", marginTop: "20px", marginBottom: "20px"}}
+            type="primary"
+            onClick={()=> sendTransaction(sendToAddress, AmoutToSend)}
+          >
+            Send Tokens
+          </Button>
+          {proccessing && (
+            <>
+              <Spin />
+              {hash && (
+                <Tooltip title={hash} >
+                  <p>Hover For Tx Hash</p>
+                </Tooltip>
+              )}
+            </>
+          )}
         </>
       ),
-    }  
+    }, 
+    //History
+    {
+      key: "4",
+      label: "History", // Tab History
+      children: (
+        <>
+          {fetching ? (
+            <Spin />
+          ) : transactions.length ? (
+            <List
+              itemLayout="horizontal"
+              dataSource={transactions}
+              renderItem={(transaction) => (
+                <List.Item>
+                  <List.Item.Meta
+                    title={`Tx Hash: ${transaction.hash}`}
+                    description={
+                      <>
+                        <p>Block Number: {transaction.blockNumber}</p>
+                        <p>Amount: {ethers.utils.formatEther(transaction.value)} ETH</p>
+                        <p>To: {transaction.to}</p>
+                        <p>
+                          <a
+                            href={`https://etherscan.io/tx/${transaction.hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View on Etherscan
+                          </a>
+                        </p>
+                      </>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          ) : (
+            <p>No transactions found</p>
+          )}
+        </>
+      ),
+    },
   ]
 
-  const tokenList = [
-    {
-      name: "Ethereum",
-      value: "0x1",
-      symbol: "ETH",
-      decimals: 18,
-      balance: 0
-    },
-    {
-      name: "Sepolia",
-      value: "0xaa36a7",
-      symbol: "SepoliaETH",
-      decimals: 18,
-      balance: 0
-    },
-    {
-      name: "Mumbai testnet",
-      value: "0x13881",
-      symbol: "LINK",
-      decimals: 18,
-      balance: 0
-    },
-    {
-      name: "Avalanche",
-      value: "0xa86a",
-      symbol: "AVAX",
-      decimals: 18,
-      balance: 0
-    },
-    {
-      name: "Polygon",
-      value: "0x89",
-      symbol: "MATIC",
-      decimals: 18,
-      balance: 0
+  //get history of transactions
+    // Lấy lịch sử giao dịch
+    async function getTransactionHistory() {
+      setFetching(true);
+      try {
+        const apiKey = 'ETHERSCAN_API_KEY'; // Thay bằng API Key của bạn
+        const baseUrl =
+          selectedChain === "sepolia"
+            ? `https://api-sepolia.etherscan.io/api`
+            : `https://api.etherscan.io/api`;
+  
+        const res = await axios.get(baseUrl, {
+          params: {
+            module: "account",
+            action: "txlist",
+            address: wallet,
+            startblock: 0,
+            endblock: 99999999,
+            sort: "desc",
+            apikey: apiKey,
+          },
+        });
+  
+        setTransactions(res.data.result || []);
+      } catch (error) {
+        console.error("Error fetching transaction history:", error);
+      }
+      setFetching(false);
     }
-  ]
+  
+  // Hàm gửi giao dịch
+  async function sendTransaction(to, amount) {
+    const chain = CHAINS_CONFIG[selectedChain]
+
+    const provider = new ethers.JsonRpcProvider(chain.rpcUrl)
+
+    const privateKey = ethers.Wallet.fromPhrase(seedPhrase).privateKey;
+
+    const wallet = new ethers.Wallet(privateKey, provider);
+
+    const tx = {
+      to: to,
+      value: ethers.parseEther(amount.toString()),
+    };
+
+    setProccessing(true)
+    try {
+      const transaction = await wallet.sendTransaction(tx);
+      setHash(transaction.hash)
+      const receipt = await transaction.wait();
+
+      setHash(null)
+      setProccessing(false)
+      setAmountToSend(null)
+      setSendToAddress(null)      
+
+      if(receipt.status === 1){
+        // Hiển thị thông báo với liên kết đến giao dịch trên Etherscan
+        openNotificationWithEtherscanLink(transaction.hash);
+        getAccountTokens()
+      } else {
+        alert("Transaction failed")
+      }
+
+    } catch (error) {
+      setHash(null)
+      setProccessing(false)
+      setAmountToSend(null)
+      setSendToAddress(null)
+    }
+  }
+
+  // Hàm hiển thị thông báo với liên kết Etherscan
+  const openNotificationWithEtherscanLink = (hash) => {
+    // Kiểm tra nếu selectedChain là Sepolia
+    const etherscanLink =
+      selectedChain === "0xaa36a7"
+        ? `https://sepolia.etherscan.io/tx/${hash}`
+        : `https://etherscan.io/tx/${hash}`;
+  
+    notification.success({
+      message: "Transaction Successful",
+      description: (
+        <a href={etherscanLink} target="_blank" rel="noopener noreferrer">
+          View Transaction on Etherscan
+        </a>
+      ),
+      duration: 0, // thông báo sẽ không tự động tắt
+    });
+  };
+  
 
   //get the tokens and NFTs of the user
   async function getAccountTokens() {
@@ -163,9 +310,11 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
       console.log(response.tokens)
     }
 
-    if(response.nfts.length > 0){
-      setNFTs(response.nfts)
+    if (response && Array.isArray(response.nfts) && response.nfts.length > 0) {
+      setNFTs(response.nfts);
     }
+
+    console.log(response.balance.balance)
 
     setBalance(response.balance.balance)
 
@@ -216,9 +365,6 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
             {wallet.slice(0, 4)}...{wallet.slice(-4)}
           </div>
         </Tooltip>
-        <div>
-          Balance: {(Number(balance) / (10 ** 18)).toFixed(4)} {tokenList.find(token => token.value === selectedChain)?.symbol}
-        </div>
         <Divider />
         {/* {fetching ? (
           <Spin />
