@@ -1,3 +1,5 @@
+By zeuxi141
+
 This basic project is for managing your cryptocurrency wallet.
 Features in this project include:
 - Viewing your collection of tokens and NFTs.
