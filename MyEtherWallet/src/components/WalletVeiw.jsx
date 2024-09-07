@@ -1,4 +1,5 @@
 import { LogoutOutlined } from "@ant-design/icons";
+import Box from "@mui/material/Box";
 import {
   Avatar,
   Button,
@@ -8,7 +9,7 @@ import {
   notification,
   Spin,
   Tabs,
-  Tooltip
+  Tooltip,
 } from "antd";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -16,26 +17,26 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CHAINS_CONFIG } from "../chain";
 import tokenList from "../tokenList";
-import TransactionHistory from './TransactionHistory';
+import TransactionHistory from "./TransactionHistory";
 
-
-
-
-
-function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain}) {
-
-  const [tokens, setTokens] = useState(null)
-  const [NFTs, setNFTs] = useState(null)
-  const [balance, setBalance] = useState(0)
-  const [fetching, setFetching] = useState(true)
-  const [sendToAddress, setSendToAddress] = useState(null)
-  const [AmoutToSend, setAmountToSend] = useState(null)
-  const [proccessing, setProccessing] = useState(false)
-  const [hash, setHash] = useState(null)
+function WalletView({
+  wallet,
+  setWallet,
+  seedPhrase,
+  setSeedPhrase,
+  selectedChain,
+}) {
+  const [tokens, setTokens] = useState(null);
+  const [NFTs, setNFTs] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [fetching, setFetching] = useState(true);
+  const [sendToAddress, setSendToAddress] = useState(null);
+  const [AmoutToSend, setAmountToSend] = useState(null);
+  const [proccessing, setProccessing] = useState(false);
+  const [hash, setHash] = useState(null);
   const [transactions, setTransactions] = useState([]);
 
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const items = [
     {
@@ -55,19 +56,24 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
                       avatar={<Avatar>{item.symbol}</Avatar>}
                       title={item.name == "Gold" ? "SpeoliaETH" : item.name}
                       description={`Balance: 
-                        ${(Number(item.balance) / 
-                        (10 ** Number(item.decimals))).toFixed(4)} Tokens
+                        ${(
+                          Number(item.balance) /
+                          10 ** Number(item.decimals)
+                        ).toFixed(4)} Tokens
                       `}
                     />
                   </List.Item>
                 )}
               />
             </>
-          ):(
+          ) : (
             <>
               <span>You seem to not have any tokens yet</span>
-              <p>Would you like to add some?
-                <a href="" className="">Get faucet here</a>
+              <p>
+                Would you like to add some?
+                <a href="" className="">
+                  Get faucet here
+                </a>
               </p>
             </>
           )}
@@ -85,8 +91,13 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
                 return (
                   <>
                     {e && (
-                      <img 
-                        style={{objectFit: "cover", width: "100px", height: "100px", marginLeft: "10px"}}
+                      <img
+                        style={{
+                          objectFit: "cover",
+                          width: "100px",
+                          height: "100px",
+                          marginLeft: "10px",
+                        }}
                         key={i}
                         className="nftImage"
                         sizes="cover"
@@ -95,14 +106,14 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
                       />
                     )}
                   </>
-                )
+                );
               })}
             </>
-          ):(
+          ) : (
             <>
-              <List/>
+              <List />
             </>
-            )}
+          )}
         </>
       ),
     },
@@ -115,29 +126,30 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
           <div className="headContent">
             <h3>Native Balance</h3>
             <div>
-            Balance: {(Number(balance) / (10 ** 18)).toFixed(4)} {tokenList.find(token => token.value === selectedChain)?.symbol}
+              Balance: {(Number(balance) / 10 ** 18).toFixed(4)}{" "}
+              {tokenList.find((token) => token.value === selectedChain)?.symbol}
             </div>
           </div>
           <div className="sendRow">
-            <p style={{width: "90px", textAlign: 'left' }}> To: </p>
-            <Input 
-              placeholder="Enter address" 
+            <p style={{ width: "90px", textAlign: "left" }}> To: </p>
+            <Input
+              placeholder="Enter address"
               value={sendToAddress}
               onChange={(e) => setSendToAddress(e.target.value)}
             />
           </div>
           <div className="sendRow">
-            <p style={{width: "90px", textAlign: 'left' }}> Amount: </p>
-            <Input 
-              placeholder="Enter amount" 
+            <p style={{ width: "90px", textAlign: "left" }}> Amount: </p>
+            <Input
+              placeholder="Enter amount"
               value={AmoutToSend}
               onChange={(e) => setAmountToSend(e.target.value)}
             />
           </div>
           <Button
-            style={{width: "100%", marginTop: "20px", marginBottom: "20px"}}
+            style={{ width: "100%", marginTop: "20px", marginBottom: "20px" }}
             type="primary"
-            onClick={()=> sendTransaction(sendToAddress, AmoutToSend)}
+            onClick={() => sendTransaction(sendToAddress, AmoutToSend)}
           >
             Send Tokens
           </Button>
@@ -145,7 +157,7 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
             <>
               <Spin />
               {hash && (
-                <Tooltip title={hash} >
+                <Tooltip title={hash}>
                   <p>Hover For Tx Hash</p>
                 </Tooltip>
               )}
@@ -153,7 +165,7 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
           )}
         </>
       ),
-    }, 
+    },
     //History
     {
       key: "4",
@@ -164,44 +176,43 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
         </>
       ),
     },
-  ]
+  ];
 
   //get history of transactions
-    // Lấy lịch sử giao dịch
-    // async function getTransactionHistory() {
-    //   setFetching(true);
-    //   try {
-    //     const apiKey = 'ETHERSCAN_API_KEY'; // Thay bằng API Key của bạn
-    //     const baseUrl =
-    //       selectedChain === "sepolia"
-    //         ? `https://api-sepolia.etherscan.io/api`
-    //         : `https://api.etherscan.io/api`;
-  
-    //     const res = await axios.get(baseUrl, {
-    //       params: {
-    //         module: "account",
-    //         action: "txlist",
-    //         address: wallet,
-    //         startblock: 0,
-    //         endblock: 99999999,
-    //         sort: "desc",
-    //         apikey: apiKey,
-    //       },
-    //     });
-  
-    //     setTransactions(res.data.result || []);
-    //   } catch (error) {
-    //     console.error("Error fetching transaction history:", error);
-    //   }
-    //   setFetching(false);
-    // }
-    
-  
+  // Lấy lịch sử giao dịch
+  // async function getTransactionHistory() {
+  //   setFetching(true);
+  //   try {
+  //     const apiKey = 'ETHERSCAN_API_KEY'; // Thay bằng API Key của bạn
+  //     const baseUrl =
+  //       selectedChain === "sepolia"
+  //         ? `https://api-sepolia.etherscan.io/api`
+  //         : `https://api.etherscan.io/api`;
+
+  //     const res = await axios.get(baseUrl, {
+  //       params: {
+  //         module: "account",
+  //         action: "txlist",
+  //         address: wallet,
+  //         startblock: 0,
+  //         endblock: 99999999,
+  //         sort: "desc",
+  //         apikey: apiKey,
+  //       },
+  //     });
+
+  //     setTransactions(res.data.result || []);
+  //   } catch (error) {
+  //     console.error("Error fetching transaction history:", error);
+  //   }
+  //   setFetching(false);
+  // }
+
   // Hàm gửi giao dịch
   async function sendTransaction(to, amount) {
-    const chain = CHAINS_CONFIG[selectedChain]
+    const chain = CHAINS_CONFIG[selectedChain];
 
-    const provider = new ethers.JsonRpcProvider(chain.rpcUrl)
+    const provider = new ethers.JsonRpcProvider(chain.rpcUrl);
 
     const privateKey = ethers.Wallet.fromPhrase(seedPhrase).privateKey;
 
@@ -212,30 +223,29 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
       value: ethers.parseEther(amount.toString()),
     };
 
-    setProccessing(true)
+    setProccessing(true);
     try {
       const transaction = await wallet.sendTransaction(tx);
-      setHash(transaction.hash)
+      setHash(transaction.hash);
       const receipt = await transaction.wait();
 
-      setHash(null)
-      setProccessing(false)
-      setAmountToSend(null)
-      setSendToAddress(null)      
+      setHash(null);
+      setProccessing(false);
+      setAmountToSend(null);
+      setSendToAddress(null);
 
-      if(receipt.status === 1){
+      if (receipt.status === 1) {
         // Hiển thị thông báo với liên kết đến giao dịch trên Etherscan
         openNotificationWithEtherscanLink(transaction.hash);
-        getAccountTokens()
+        getAccountTokens();
       } else {
-        alert("Transaction failed")
+        alert("Transaction failed");
       }
-
     } catch (error) {
-      setHash(null)
-      setProccessing(false)
-      setAmountToSend(null)
-      setSendToAddress(null)
+      setHash(null);
+      setProccessing(false);
+      setAmountToSend(null);
+      setSendToAddress(null);
     }
   }
 
@@ -246,7 +256,7 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
       selectedChain === "0xaa36a7"
         ? `https://sepolia.etherscan.io/tx/${hash}`
         : `https://etherscan.io/tx/${hash}`;
-  
+
     notification.success({
       message: "Transaction Successful",
       description: (
@@ -257,90 +267,88 @@ function WalletView({wallet, setWallet, seedPhrase, setSeedPhrase, selectedChain
       duration: 0, // thông báo sẽ không tự động tắt
     });
   };
-  
 
   //get the tokens and NFTs of the user
   async function getAccountTokens() {
-    setFetching(true)
+    setFetching(true);
 
-    const res = await axios.get(
-      `http://localhost:8017/getTokens`, {
-        params: {
-          userAddress: wallet,
-          chain: selectedChain
-        }
+    const res = await axios.get(`http://localhost:8017/getTokens`, {
+      params: {
+        userAddress: wallet,
+        chain: selectedChain,
+      },
     });
 
-    const response = res.data
+    const response = res.data;
 
-    console.log(response)
+    console.log(response);
 
-    if(response.tokens.length > 0){
-      setTokens(response.tokens)
-      console.log(response.tokens)
+    if (response.tokens.length > 0) {
+      setTokens(response.tokens);
+      console.log(response.tokens);
     }
 
     if (response && Array.isArray(response.nfts) && response.nfts.length > 0) {
       setNFTs(response.nfts);
     }
 
-    console.log(response.balance.balance)
+    console.log(response.balance.balance);
 
-    setBalance(response.balance.balance)
+    setBalance(response.balance.balance);
 
-    setFetching(false)
-
+    setFetching(false);
   }
 
   //logout the user
   function logout() {
-    setWallet(null)
-    setSeedPhrase(null)
-    setNFTs(null)
-    setTokens(null)
-    setBalance(0)
-    navigate("/")
+    setWallet(null);
+    setSeedPhrase(null);
+    setNFTs(null);
+    setTokens(null);
+    setBalance(0);
+    navigate("/");
   }
 
   //get the tokens and NFTs of the user when the component mounts
   useEffect(() => {
-    if(!wallet || !selectedChain) return;
-    setNFTs(null)
-    setTokens(null)
-    setBalance(0)
+    if (!wallet || !selectedChain) return;
+    setNFTs(null);
+    setTokens(null);
+    setBalance(0);
     getAccountTokens();
-  }, [])
-
+  }, []);
 
   //get the tokens and NFTs of the user when the chain changes
   useEffect(() => {
-    if(!wallet) return;
-    setNFTs(null)
-    setTokens(null)
-    setBalance(0)
+    if (!wallet) return;
+    setNFTs(null);
+    setTokens(null);
+    setBalance(0);
     getAccountTokens();
-  }, [selectedChain])
+  }, [selectedChain]);
 
   return (
     <div>
-      <div className="content">
-        <div className="logoutButton" onClick={logout}>
-          <LogoutOutlined />
-        </div>
-        <div className="walletName">
-          Wallet
-        </div>
-        <Tooltip title={`Wallet address: ${wallet}`}>
-          <div>
-            {wallet.slice(0, 4)}...{wallet.slice(-4)}
-          </div>
-        </Tooltip>
+      <div className="content" style={{ margin: "20px 0px", widt: '100%' }}>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <Box sx={{marginLeft: '20px'}}>
+            <div className="walletName">Wallet</div>
+            <Tooltip title={`Wallet address: ${wallet}`}>
+              <div>
+                {wallet.slice(0, 4)}...{wallet.slice(-4)}
+              </div>
+            </Tooltip>
+          </Box>
+          <Box style={{marginRight: '100px' , cursor: 'pointer'}} className="logoutButton" onClick={logout}>
+            <LogoutOutlined />
+          </Box>
+        </Box>
         <Divider />
         {/* {fetching ? (
           <Spin />
         ):(
         )} */}
-        <Tabs defaultActiveKey="1" items={items} className="walletVeiw"></Tabs> 
+        <Tabs defaultActiveKey="1" items={items} className="walletVeiw"></Tabs>
       </div>
     </div>
   );

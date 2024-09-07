@@ -1,6 +1,6 @@
 // import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button } from "@mui/material";
 import TextField from "@mui/material/TextField";
+import { Button } from 'antd';
 import { ethers } from "ethers";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ function CreateWallet({setWallet, setSeedPhrase}) {
 
   return (
     <>
-      <div className="content">
+      <div className="content" style={{textAlign: 'center'}}>
         {/* <ExclamationCircleOutlined style={{ fontSize: "20px" }} /> */}
         <div className="mnemonic">
           <div>
@@ -32,12 +32,16 @@ function CreateWallet({setWallet, setSeedPhrase}) {
           </div>
         </div>
         <Button
+          type="primary"
+          style={{margin: '20px 0'}}
           onClick={()=>generateWallet()}
         >Generate Seed Phrase</Button>
         <br />
         <TextField id="standard-multiline-static" value={newSeedPhrase} multiline rows={4}  />
         <br />
         <Button
+          type="primary"
+          style={{margin: '20px 0'}}
           onClick={()=>setWalletAndMnemonic()}
         >
           Open Your New Wallet
@@ -46,7 +50,7 @@ function CreateWallet({setWallet, setSeedPhrase}) {
 
       <div className="footer">
         <div>
-          <Button onClick={() => navigate("/")}>Back</Button>
+          <Button type="primary" onClick={() => navigate("/")}>Back</Button>
         </div>
       </div>
     </>

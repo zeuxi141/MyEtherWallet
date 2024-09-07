@@ -25,6 +25,7 @@ select {
 
 .flexButton {
   display: flex;
+  justify-content: center;
 }
 
 /* button back */

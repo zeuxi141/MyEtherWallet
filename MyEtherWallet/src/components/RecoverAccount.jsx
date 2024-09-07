@@ -36,12 +36,13 @@ function RecoverAccount({setWallet, setSeedPhrase}) {
 
   return (
     <div>
-      <div className="content">
-        <div>
+      <div className="content" style={{margin: '20px 10px'}}>
+        <div style={{marginBottom: '10px'}}>
           Type your seed phrase in the field below to recover your wallet (it should include 12 words separated by spaces)
         </div>
         <TextArea
           value={typedSeed}
+          style={{marginBottom: '10px'}}
           onChange={seedAjust}
           placeholder="Type your seed phrase here..."
           // autoSize={{ minRows: 3, maxRows: 5 }}

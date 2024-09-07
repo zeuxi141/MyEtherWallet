@@ -1,4 +1,5 @@
-import { Button } from "@mui/material";
+import { Box } from "@mui/material";
+import { Button } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -6,22 +7,21 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <Box sx={{width: '100%', height: '100vh', textAlign:'center'}}>
       <div className="content">
-        <img src="https://www.myetherwallet.com/img/logo.svg" alt="logo" />
-        <h2>MyEtherWallet</h2>
+        <h1 style={{fontSize: '50px'}}>MyEtherWallet</h1>
         <h4 className="h4">Welcome to your MyWallet</h4>
       </div>
       <div className="flexButton">
-        <Button onClick={() => navigate("/yourwallet")}>
+        <Button type="primary" style={{width: '200px', margin: '10px'}} onClick={() => navigate("/yourwallet")}>
           Create your wallet
         </Button>
 
-        <Button onClick={() => navigate("/recover")}>
+        <Button type="primary" style={{width: '200px', margin: '10px'}} onClick={() => navigate("/recover")}>
           Sign In With Seed Pharse
         </Button>
       </div>
-    </div>
+    </Box>
   );
 }
 
