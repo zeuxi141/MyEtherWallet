@@ -7,7 +7,7 @@ Features in this project include:
 - Logging into your wallet with a seed phrase.
 - Sending tokens to another address.
 - Viewing the transaction history of the wallet.
-### These features only work on the Sepolia testnet. They can also work on the Ethereum network but may have some bugs. ####
+### These features only work on the Sepolia testnet. It can also work on the Ethereum network but may have some bugs. ####
 
 
 
